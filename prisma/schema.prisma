@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type Weight {
+  value  Float    
+  unit   WeightUnit
+  date   DateTime
+}
+
+type Height {
+  value  Float  
+  unit   HeightUnit
+  date   DateTime
+}
+
+type Set {
+  rep   Int  
+  weight Weight
+}
+model User {
+  clerkId   String  @id @map("_id")
+  username  String              @unique
+  name      String?
+  weight    Weight[]
+  height    Height[]
+  age       Int?
+  workouts  WorkoutHistory[]
+  favorites embeddedexercises[]
+}
+
+
+model WorkoutHistory {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime
+  user      User              @relation(fields: [userId], references: [clerkId])
+  userId    String
+  exercises WorkoutExercise[]
+  workoutHistoryTitle String?
+  favourited Boolean @default(false)
+  @@unique([userId,workoutHistoryTitle])
+}
+
+model WorkoutExercise {
+  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
+  workoutHistory      WorkoutHistory    @relation(fields: [workoutHistoryId], references: [id],onDelete: Cascade)
+  workoutHistoryId    String
+  embeddedexercises   embeddedexercises @relation(fields: [embeddedexercisesId], references: [id])
+  embeddedexercisesId String
+  sets                Set[]
+}
+
+model embeddedexercises {
+  id         String      @id @map("_id") @db.ObjectId
+  Title      String
+  Desc       String
+  Type       String
+  BodyPart   BodyPart
+  Equipment  Equipment
+  Level      String
+  Rating     String
+  RatingDesc String
+  embeddings Float[]
+
+  // One-to-Many relationship with WorkoutExercise (used in workout history)
+  workoutExercises WorkoutExercise[]
+  User             User?             @relation(fields: [userId], references: [clerkId])
+  userId           String?           @db.ObjectId
+}
+
+
+enum Equipment {
+  Foam_Roll
+  Cable
+  Dumbbell
+  Barbell
+  Kettlebells
+  Body_Only
+  Bands
+  Exercise_Ball
+  None
+  EZ_Curl_Bar
+  Medicine_Ball
+  Machine
+  Other
+}
+
+enum BodyPart {
+  Abdominals
+  Abductors
+  Adductors
+  Biceps
+  Calves
+  Chest
+  Hamstrings
+  Traps
+  Neck
+  Glutes
+  Lower_Back
+  Lats
+  Middle_Back
+  Shoulders
+  Triceps
+  Quadriceps
+  Forearms
+}
+
+
+enum WeightUnit {
+  KG
+  LB
+}
+
+
+
+enum HeightUnit {
+  CM
+  FT_IN
+}
