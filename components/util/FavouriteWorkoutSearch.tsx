@@ -102,8 +102,23 @@ function FavouriteWorkoutSearch({ favouriteWorkoutsForSearch }: Props) {
           >
             Import w/ Sets!
           </Button>
-          <Button className="w-[60vw] md:w-fit" variant={"default"}>
-            Import Execise only
+          <Button
+            className="w-[60vw] md:w-fit"
+            variant={"default"}
+            onClick={async () => {
+              const newDate = new Date(
+                localStorage.getItem("selected-date") + ""
+              );
+              const out = await copyWorkoutHistory({
+                newDate,
+                workoutHistoryId: selectedFavouriteWorkoutId,
+                noSets: true,
+              });
+              if (out.passed) location.reload();
+              else toast({ title: "something went wrong,try again later" });
+            }}
+          >
+            Import Exercise only
           </Button>
         </div>
       )}

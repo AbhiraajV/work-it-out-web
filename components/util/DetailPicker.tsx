@@ -38,7 +38,6 @@ function DetailPicker({ currentUser, setCurrentUser }: Props) {
   const weightRef = useRef<HTMLDivElement>(null);
   const ageRef = useRef<HTMLDivElement>(null);
 
-  // Initialize the states from currentUser
   useEffect(() => {
     if (currentUser) {
       const wu = currentUser.weight[currentUser.weight.length - 1]?.unit;
@@ -51,116 +50,61 @@ function DetailPicker({ currentUser, setCurrentUser }: Props) {
     }
   }, [currentUser]);
 
-  const handleValueChange = async (type: string) => {
+  const handleValueChange = async () => {
     if (!currentUser) return;
 
-    // Get new values
     const newHeightValue = parseFloat(heightRef.current?.innerText || "0.0");
     const newWeightValue = parseFloat(weightRef.current?.innerText || "0.0");
     const newAge = parseInt(ageRef.current?.innerText || "0");
 
     const updatedUser: User = {
-      clerkId: currentUser.clerkId,
-      username: currentUser.username,
-      name: currentUser.name || "",
-      age: currentUser.age || 0,
-      weight: [...(currentUser?.weight || [])],
-      height: [...(currentUser?.height || [])],
+      ...currentUser,
+      age: newAge,
+      weight: [...currentUser.weight],
+      height: [...currentUser.height],
     };
 
-    if (type === "height") {
-      if (!heightValue.unit) {
-        toast({
-          title: "Failed to update height",
-          description: "Error: Height unit is not set.",
-        });
-        return;
-      }
+    if (heightValue.unit) {
       updatedUser.height.push({
         value: newHeightValue,
         unit: heightValue.unit,
         date: new Date(),
       });
       setHeightValue({ ...heightValue, value: newHeightValue });
-      const updatedUserDB = await updateUserState(
-        undefined,
-        {
-          date: new Date(),
-          unit: heightValue.unit,
-          value: newHeightValue,
-        },
-        undefined,
-        currentUser?.clerkId
-      );
-      if (updatedUserDB.failed) {
-        toast({
-          title: "Failed height update",
-          description: updatedUserDB.message,
-        });
-      }
-      if (updatedUserDB.userCreated) {
-        toast({
-          title: "Height updated",
-        });
-        setCurrentUser(updatedUserDB.user);
-      }
-    } else if (type === "weight") {
-      if (!weightValue.unit) {
-        toast({
-          title: "Failed to update weight",
-          description: "Error: Weight unit is not set.",
-        });
-        return;
-      }
+    }
+
+    if (weightValue.unit) {
       updatedUser.weight.push({
         value: newWeightValue,
         unit: weightValue.unit,
         date: new Date(),
       });
       setWeightValue({ ...weightValue, value: newWeightValue });
-      const updatedUserDB = await updateUserState(
-        {
-          date: new Date(),
-          unit: weightValue.unit,
-          value: newWeightValue,
-        },
-        undefined,
-        undefined,
-        currentUser?.clerkId
-      );
-      if (updatedUserDB.failed) {
-        toast({
-          title: "Failed weight update",
-          description: updatedUserDB.message,
-        });
-      }
-      if (updatedUserDB.userCreated) {
-        toast({
-          title: "Weight updated",
-        });
-        setCurrentUser(updatedUserDB.user);
-      }
-    } else if (type === "age") {
-      updatedUser.age = newAge;
-      setAge(newAge);
-      const updatedUserDB = await updateUserState(
-        undefined,
-        undefined,
-        newAge,
-        currentUser?.clerkId
-      );
-      if (updatedUserDB.failed) {
-        toast({
-          title: "Failed age update",
-          description: updatedUserDB.message,
-        });
-      }
-      if (updatedUserDB.userCreated) {
-        toast({
-          title: "Age updated",
-        });
-        setCurrentUser(updatedUserDB.user);
-      }
+    }
+
+    setAge(newAge);
+
+    const updatedUserDB = await updateUserState(
+      weightValue.unit
+        ? { date: new Date(), unit: weightValue.unit, value: newWeightValue }
+        : undefined,
+      heightValue.unit
+        ? { date: new Date(), unit: heightValue.unit, value: newHeightValue }
+        : undefined,
+      newAge,
+      currentUser.clerkId
+    );
+
+    if (updatedUserDB.failed) {
+      toast({
+        title: "Failed to update details",
+        description: updatedUserDB.message,
+      });
+    } else if (updatedUserDB.userCreated) {
+      toast({
+        title: "Details updated",
+      });
+      setCurrentUser(updatedUserDB.user);
     }
   };
 
@@ -174,40 +118,27 @@ function DetailPicker({ currentUser, setCurrentUser }: Props) {
     };
   };
 
-  const scheduleSave = (type: string) => {
-    debounce(() => handleValueChange(type), 1000)();
-  };
-
   useEffect(() => {
-    if (heightRef.current) {
-      heightRef.current.addEventListener("input", () => scheduleSave("height"));
-    }
-    if (weightRef.current) {
-      weightRef.current.addEventListener("input", () => scheduleSave("weight"));
-    }
-    if (ageRef.current) {
-      ageRef.current.addEventListener("input", () => scheduleSave("age"));
-    }
+    const handler = debounce(handleValueChange, 1200);
+    const refs = [heightRef, weightRef, ageRef];
+
+    refs.forEach((ref) => {
+      if (ref.current) {
+        ref.current.addEventListener("input", handler);
+      }
+    });
 
     return () => {
-      if (heightRef.current) {
-        heightRef.current.removeEventListener("input", () =>
-          scheduleSave("height")
-        );
-      }
-      if (weightRef.current) {
-        weightRef.current.removeEventListener("input", () =>
-          scheduleSave("weight")
-        );
-      }
-      if (ageRef.current) {
-        ageRef.current.removeEventListener("input", () => scheduleSave("age"));
-      }
+      refs.forEach((ref) => {
+        if (ref.current) {
+          ref.current.removeEventListener("input", handler);
+        }
+      });
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
     };
-  }, [timeoutId, currentUser, scheduleSave]);
+  }, [timeoutId, currentUser]);
 
   return (
     <div className="flex flex-col gap-1">

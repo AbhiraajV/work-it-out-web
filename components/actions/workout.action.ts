@@ -10,8 +10,8 @@ export const findRelevantWorkout = async ({
   query: string;
   bodyPart: BodyPart | undefined;
 }) => {
-  const limit = 20;
-  const numCandidates = 200;
+  const limit = 5;
+  const numCandidates = 400;
   if (limit <= 0 || !Number.isInteger(limit)) {
     throw new Error("Invalid limit: must be a positive integer");
   }
@@ -19,53 +19,41 @@ export const findRelevantWorkout = async ({
   if (numCandidates <= 0 || !Number.isInteger(numCandidates)) {
     throw new Error("Invalid numCandidates: must be a positive integer");
   }
-  const must = [
-    {
-      queryString: {
-        defaultPath: "Desc",
-        query: query,
-      },
-    },
-    {
-      queryString: {
-        defaultPath: "Title",
-        query: query,
-      },
-    },
 
-    // {
-    //   queryString: {
-    //     defaultPath: "Equipment",
-    //     query: "Dumbbell",
-    //   },
-    // },
-  ];
+  const filter = [];
   if (bodyPart && (bodyPart as string) !== "Any")
-    must.push({
-      queryString: {
-        defaultPath: "BodyPart",
+    filter.push({
+      text: {
         query: bodyPart,
+        path: "BodyPart",
       },
     });
-  console.log(must);
   try {
     const out = await prisma.embeddedexercises.aggregateRaw({
       pipeline: [
         {
           $search: {
-            index: "descriptionIndex",
-
+            index: "semanticSearchByName",
             compound: {
-              must,
-              // minimumShouldMatch: 1, // should
+              must: [
+                {
+                  text: {
+                    query: query,
+                    path: {
+                      wildcard: "*",
+                    },
+                    fuzzy: {
+                      maxEdits: 2,
+                      prefixLength: 0,
+                      maxExpansions: 50,
+                    },
+                  },
+                },
+              ],
+              filter,
             },
           },
         },
-        // {
-        //   $match: {
-        //     BodyPart: bodyPart,
-        //   },
-        // },
         {
           $project: {
             id: 1,
@@ -89,7 +77,6 @@ export const findRelevantWorkout = async ({
         },
       ],
     });
-    console.log({ out });
     return out;
   } catch (error) {
     console.error("Error finding relevant workout:", error);
@@ -208,13 +195,9 @@ export const fixEx = async (run: string) => {
             BodyPart: transformedBodyPart as BodyPart,
           },
         })
-        .then(() => {
-          console.log("Updated " + exercise.id);
-        });
+        .then(() => {});
     }
   }
-
-  console.log("Update completed");
 };
 
 export const deleteWorkout = async ({ exerciseId }: { exerciseId: string }) => {
@@ -489,7 +472,6 @@ export const findRelevantWorkoutAdvancedSearch = async (formData: FormData) => {
         },
       ],
     });
-    console.log({ out });
     return out;
   } catch (error) {
     console.error("Error finding relevant workout:", error);

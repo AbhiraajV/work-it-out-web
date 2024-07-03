@@ -49,7 +49,7 @@ function WorkoutDisplay({ workouts, removeWorkout, userId }: Props) {
           {/* Put any fixed header or other content here */}
         </div>
 
-        <div className="flex-grow p-2 flex flex-col gap-2 relative custom-scrollbar overflow-y-scroll overflow-x-hidden pb-3 mb-[50px]">
+        <div className="flex-none md:flex-grow p-2 flex flex-col gap-2 relative custom-scrollbar overflow-y-scroll overflow-x-hidden pb-3 mb-0 md:mb-[50px] items-center justify-center">
           {(!workouts || workouts.exercises.length === 0) && (
             <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center gap-[-1rem]">
               <span className="text-9xl">🤷🏻‍♂️</span>

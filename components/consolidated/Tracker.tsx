@@ -30,9 +30,10 @@ export default function Tracker({ user }: Props) {
   const [workouts, setWorkouts] = useState<WorkoutHistoryWithExercises | null>(
     null
   );
+  const [searchWorkoutLoading, setSearchWorkoutLoading] = useState(false);
   const [searchWorkouts, setSearchWorkouts] = useState<
-    Partial<embeddedexercises>[] | []
-  >([]);
+    Partial<embeddedexercises>[] | undefined
+  >(undefined);
 
   const searchFunction = async ({
     query,
@@ -41,10 +42,13 @@ export default function Tracker({ user }: Props) {
     query: string;
     bodyPart: BodyPart | undefined;
   }) => {
+    setSearchWorkoutLoading(true);
     const w = (await findRelevantWorkout({
       query,
       bodyPart,
     })) as any;
+
+    setSearchWorkoutLoading(false);
     setSearchWorkouts(w);
   };
 
@@ -187,6 +191,7 @@ export default function Tracker({ user }: Props) {
           {
             comp: (
               <ExcerciseCarousel
+                loading={searchWorkoutLoading}
                 addNewWorkout={addNewWorkout}
                 searchFunction={searchFunction}
                 workouts={searchWorkouts}
