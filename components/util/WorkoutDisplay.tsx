@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
 import FavouriteWorkoutSearch from "./FavouriteWorkoutSearch";
 import Link from "next/link";
+import MaximizeMinimize from "./MaximizeMinimize";
 
 type Props = {
   workouts: WorkoutHistoryWithExercises | undefined;
@@ -38,16 +39,31 @@ function WorkoutDisplay({ workouts, removeWorkout, userId }: Props) {
 
     fetchFavouriteWorkouts();
   }, [workouts, userId]);
-
+  const [fullscreen, setFullscreen] = useState(false);
   return (
-    <>
+    <div
+      className={`transition-all duration-500 ease-in-out ${
+        fullscreen
+          ? "absolute top-[-10%] bg-white z-[980] w-[107.9vw] ml-[-4vw]"
+          : "relative top-[50%] bg-white w-full ml-0"
+      }`}
+    >
       {workouts && <AutoUpdatingWorkoutName workouts={workouts} />}
 
-      <div className=" w-full flex flex-col h-screen">
+      <div className="relative w-full flex flex-col h-screen">
         {/* Ensure the header takes its place */}
-        <div className=" w-full flex-none">
-          {/* Put any fixed header or other content here */}
-        </div>
+        {workouts && workouts.exercises.length !== 0 && (
+          <div
+            onClick={() => setFullscreen(!fullscreen)}
+            className={
+              fullscreen
+                ? "fixed z-[990] top-[8%] right-[-2%] rounded-[50%] flex items-center justify-center bg-black w-[30px] h-[30px] py-1 px-2 transition-all duration-300 ease-in-out"
+                : "fixed z-[990] top-[40%] right-[2%] rounded-[50%] flex items-center justify-center bg-black w-[30px] h-[30px] py-1 px-2 transition-all duration-300 ease-in-out"
+            }
+          >
+            <MaximizeMinimize maximized={fullscreen} />
+          </div>
+        )}
 
         <div className=" w-full flex-grow p-2 flex flex-col gap-2 relative custom-scrollbar overflow-y-scroll overflow-x-hidden pb-3 mb-[50px]">
           {" "}
@@ -93,7 +109,7 @@ function WorkoutDisplay({ workouts, removeWorkout, userId }: Props) {
           {/* Put any fixed footer or other content here */}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

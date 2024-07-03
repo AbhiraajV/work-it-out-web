@@ -572,3 +572,12 @@ export const copyWorkoutHistory = async ({
     };
   }
 };
+
+// const getPreviousSetsForThisWorkout = async ({exerciseId}:{exerciseId:string}) => {
+//   const previousSets = await prisma.workoutExercise.findMany({
+//     where:{embeddedexercisesId:exerciseId},
+//     select:{
+//       sets:true,
+//     },
+//   })
+// }

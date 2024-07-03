@@ -56,7 +56,15 @@ export default function Tracker({ user }: Props) {
     if (!workoutExeciseId) {
       return;
     }
-
+    setWorkouts(
+      (prev) =>
+        ({
+          ...prev,
+          exercises: prev?.exercises.filter(
+            (exer) => exer.id !== workoutExeciseId
+          ),
+        } as WorkoutHistoryWithExercises)
+    );
     try {
       const out = await deleteWorkout({
         exerciseId: workoutExeciseId,
@@ -66,7 +74,7 @@ export default function Tracker({ user }: Props) {
         return;
       }
       if (out.passed) {
-        await getWorkouts();
+        // await getWorkouts();
         toast({
           title: "Workout removed!",
           description: "Now switch to workouts page and add sets & reps ",

@@ -125,7 +125,6 @@ function AutoUpdatingWorkoutName({ workouts }: Props) {
 
     const out = await updateWorkoutTitle(newWorkoutTitle, workouts?.id);
     if (out.passed) {
-      setWorkoutTitle(out.data.workoutHistoryTitle + "");
       toast({
         title: "Workout title updated successfully",
       });
@@ -163,17 +162,26 @@ function AutoUpdatingWorkoutName({ workouts }: Props) {
     };
   }, [timeoutId]);
 
+  const [expandText, setExpandText] = useState(false);
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start text-xl font-semibold bg-black text-white py-2 px-3 rounded-sm">
+    <div className="flex flex-col md:flex-row justify-between items-start text-xl mr-[1vw] md:ml-0 font-semibold bg-black text-white py-2 px-3 rounded-sm">
       <div className="flex flex-col justify-between items-baseline">
         <div className="flex gap-1 items-center justify-start">
           <div
             ref={divRef}
             id="profile_name"
-            className="text-xl w-fit font-bold border-b-purple-600 border-b-4 border-dashed"
+            onClick={() => setExpandText(true)}
+            className={
+              !expandText
+                ? "text-xl truncate w-[60%] font-bold border-b-purple-600 border-b-4 border-dashed"
+                : "text-xl w-fit font-bold border-b-purple-600 border-b-4 border-dashed"
+            }
             contentEditable
             style={{ outline: "none" }}
-            onBlur={() => handleWorkoutTitleChange()}
+            onBlur={() => {
+              handleWorkoutTitleChange();
+              setExpandText(false);
+            }}
             suppressContentEditableWarning={true}
           >
             {workoutTitle}
@@ -188,15 +196,15 @@ function AutoUpdatingWorkoutName({ workouts }: Props) {
             {fav ? <>⭐</> : <Star />}
           </span>
         </div>
-        <div className="text-xs">
+        {/* <div className="text-xs">
           Make it a favourite, to use this workout again!
-        </div>
+        </div> */}
       </div>
       <div className="flex flex-col max-w-[40%]">
-        <span className="text-lg inline w-[100vw]">
+        {/* <span className="text-lg inline w-[100vw]">
           {workouts?.exercises.length} Exercises
-        </span>
-        <div className="flex flex-row overflow-scroll custom-scrollbar w-[90vw]">
+        </span> */}
+        <div className="flex flex-row flex-wrap custom-scrollbar w-[90vw]">
           {Object.keys(workoutStats.bodyPartCounts).map((key) => (
             <Badge
               variant={"secondary"}

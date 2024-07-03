@@ -19,6 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
 
 export function PopoverSet({
   workoutExerciseId,
@@ -85,7 +90,7 @@ export function PopoverSet({
             sets: newSets,
           });
           if (result.passed) {
-            setSetsState(result.data);
+            // setSetsState(result.data);
             toast({
               title: "Sets updated",
               description: "Workout sets have been successfully updated.",
@@ -103,10 +108,10 @@ export function PopoverSet({
           });
           console.error(error);
         }
-      }, 2000);
+      }, 1200);
       setDebounceTimeout(timeout);
     },
-    [debounceTimeout, setSetsState, toast, workoutExerciseId]
+    [debounceTimeout, toast, workoutExerciseId]
   );
 
   const handleKeyPress = (
@@ -205,6 +210,8 @@ export function PopoverSet({
 
   return (
     <div className="min-w-[120%] overflow-x-hidden flex flex-col gap-1 text-md md:text-sm">
+      <div className="w-[82%] h-[1px] p-0 block md:hidden"></div>
+
       {sets.map((set, rowIndex) => (
         <div className="flex items-center gap-2" key={rowIndex}>
           <div className="flex gap-1 items-center w-[100%]">
@@ -263,6 +270,7 @@ export function PopoverSet({
           </div>
         </div>
       ))}
+
       <Button className="w-[82%] h-[1px] p-0 block md:hidden"></Button>
     </div>
   );
