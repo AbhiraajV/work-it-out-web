@@ -43,13 +43,14 @@ function WorkoutDisplay({ workouts, removeWorkout, userId }: Props) {
     <>
       {workouts && <AutoUpdatingWorkoutName workouts={workouts} />}
 
-      <div className="flex flex-col h-screen">
+      <div className=" w-full flex flex-col h-screen">
         {/* Ensure the header takes its place */}
-        <div className="flex-none">
+        <div className=" w-full flex-none">
           {/* Put any fixed header or other content here */}
         </div>
 
-        <div className="flex-none md:flex-grow p-2 flex flex-col gap-2 relative custom-scrollbar overflow-y-scroll overflow-x-hidden pb-3 mb-0 md:mb-[50px] items-center justify-center">
+        <div className=" w-full flex-grow p-2 flex flex-col gap-2 relative custom-scrollbar overflow-y-scroll overflow-x-hidden pb-3 mb-[50px]">
+          {" "}
           {(!workouts || workouts.exercises.length === 0) && (
             <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center gap-[-1rem]">
               <span className="text-9xl">🤷🏻‍♂️</span>
@@ -71,7 +72,7 @@ function WorkoutDisplay({ workouts, removeWorkout, userId }: Props) {
               </div>
             </div>
           )}
-          <div className=" grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mb-[300px] md:mb-[20px] w-[92vw] ml-[-2vw] md:ml-0 md:w-[100%]">
+          <div className=" grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mb-[300px] md:mb-[20px] w-[100%] md:ml-0 md:w-[100%]">
             {workouts &&
               workouts.exercises.map((exercise) => (
                 <WorkoutCard

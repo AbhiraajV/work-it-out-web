@@ -151,7 +151,7 @@ export default function Tracker({ user }: Props) {
 
   if (!user) return null;
   return (
-    <div className="flex flex-col gap-4 mt-5 w-[100%] h-[100vh]">
+    <div className="flex flex-col gap-4 mt-5 w-screen md:w-[100%] h-[100vh] ml-[-2.5vw]">
       <div className="flex gap-1 items-center">
         <DatePickerDemo date={date} setDate={setDate} />
 

@@ -114,7 +114,7 @@ export function PopoverSet({
     rowIndex: number,
     colIndex: number
   ) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || e.key === "Tab") {
       e.preventDefault();
       const nextColIndex = colIndex + 1;
       const nextRowIndex = rowIndex + (nextColIndex >= 2 ? 1 : 0);
@@ -168,51 +168,80 @@ export function PopoverSet({
         }, 0);
       }
     }
+
+    if (
+      e.keyCode === 13 ||
+      e.keyCode === 9 ||
+      e.key === "Enter" ||
+      e.key === "Tab"
+    ) {
+      e.preventDefault();
+      const nextColIndex = colIndex + 1;
+      const nextRowIndex = rowIndex + (nextColIndex >= 2 ? 1 : 0);
+      const nextFieldIndex = nextColIndex % 2;
+
+      if (nextRowIndex >= sets.length) {
+        // Add a new row
+        const newSets = [
+          ...sets,
+          {
+            rep: 0,
+            weight: {
+              value: 0,
+              unit: sets[sets.length - 1].weight.unit as WeightUnit,
+              date: new Date(),
+            },
+          },
+        ];
+        setSetsState(newSets);
+        setTimeout(() => {
+          inputRefs.current[nextRowIndex][0]?.focus();
+        }, 0);
+      } else {
+        inputRefs.current[nextRowIndex][nextFieldIndex]?.focus();
+      }
+    }
   };
 
   return (
-    <div className="w-[100%] max-w-[100%] overflow-x-hidden flex flex-col gap-4 text-md md:text-sm">
-      <div className="flex flex-col gap-1 max-w-[100%]">
-        {sets.map((set, rowIndex) => (
-          <div className="flex items-center gap-2" key={rowIndex}>
-            <div className="flex gap-1 items-center w-[100%]">
-              <Label htmlFor={`weight-${rowIndex}`}>Weight</Label>
-              <Input
-                ref={(el) => {
-                  if (!inputRefs.current[rowIndex])
-                    inputRefs.current[rowIndex] = [];
-                  inputRefs.current[rowIndex][0] = el;
-                }}
-                value={set.weight.value}
-                className="w-[50%] h-8"
-                type="number"
-                onChange={(e) =>
-                  handleChange(rowIndex, "weight", e.target.value)
-                }
-                onKeyPress={(e) => handleKeyPress(e, rowIndex, 0)}
-                onKeyDown={(e) => handleBackspace(e, rowIndex, 0)}
-              />
-              <Select
-                onValueChange={(value) =>
-                  handleUnitChange(rowIndex, value as WeightUnit)
-                }
-                value={set.weight.unit}
-              >
-                <SelectTrigger className="w-[55%]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>unit?</SelectLabel>
-                    {(["KG", "LB"] as WeightUnit[]).map((unit) => (
-                      <SelectItem value={unit} key={unit}>
-                        {unit === "KG" ? "kgs" : "lbs"}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+    <div className="min-w-[120%] overflow-x-hidden flex flex-col gap-1 text-md md:text-sm">
+      {sets.map((set, rowIndex) => (
+        <div className="flex items-center gap-2" key={rowIndex}>
+          <div className="flex gap-1 items-center w-[100%]">
+            <Label htmlFor={`weight-${rowIndex}`}>Weight</Label>
+            <Input
+              ref={(el) => {
+                if (!inputRefs.current[rowIndex])
+                  inputRefs.current[rowIndex] = [];
+                inputRefs.current[rowIndex][0] = el;
+              }}
+              value={set.weight.value}
+              className="w-[30%] h-8"
+              type="number"
+              onChange={(e) => handleChange(rowIndex, "weight", e.target.value)}
+              // onKeyPress={(e) => handleKeyPress(e, rowIndex, 0)}
+              onKeyDown={(e) => handleBackspace(e, rowIndex, 0)}
+            />
+            <Select
+              onValueChange={(value) =>
+                handleUnitChange(rowIndex, value as WeightUnit)
+              }
+              value={set.weight.unit}
+            >
+              <SelectTrigger className="w-[25%]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>unit?</SelectLabel>
+                  {(["KG", "LB"] as WeightUnit[]).map((unit) => (
+                    <SelectItem value={unit} key={unit}>
+                      {unit === "KG" ? "kgs" : "lbs"}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <div className="flex gap-1 items-center">
               <Label htmlFor={`reps-${rowIndex}`}>Reps</Label>
               <Input
@@ -222,16 +251,19 @@ export function PopoverSet({
                   inputRefs.current[rowIndex][1] = el;
                 }}
                 value={set.rep}
-                className="w-[100%] h-8"
+                className="w-[35%] h-8"
                 type="number"
+                // inputMode="numeric"
                 onChange={(e) => handleChange(rowIndex, "rep", e.target.value)}
-                onKeyPress={(e) => handleKeyPress(e, rowIndex, 1)}
+                // onKeyPress={(e) => handleKeyPress(e, rowIndex, 1)}
                 onKeyDown={(e) => handleBackspace(e, rowIndex, 1)}
+                // onKeyUp={}
               />
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
+      <Button className="w-[82%] h-[1px] p-0 block md:hidden"></Button>
     </div>
   );
 }
