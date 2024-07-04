@@ -18,15 +18,15 @@ import {
 import { Button } from "../ui/button";
 
 type Props = {
-  user: User | null;
+  user: User;
 };
-
 export default function Tracker({ user }: Props) {
   const initialDate = new Date(
     localStorage.getItem("selected-date") || new Date().toDateString()
   );
   const [date, setDate] = useState<Date | undefined>(initialDate);
 
+  const getStoredWorkoutsKey = () => date + "-workout-stored";
   const [workouts, setWorkouts] = useState<WorkoutHistoryWithExercises | null>(
     null
   );
@@ -65,6 +65,7 @@ export default function Tracker({ user }: Props) {
           ),
         } as WorkoutHistoryWithExercises)
     );
+    localStorage.removeItem(getStoredWorkoutsKey());
     try {
       const out = await deleteWorkout({
         exerciseId: workoutExeciseId,
@@ -74,7 +75,6 @@ export default function Tracker({ user }: Props) {
         return;
       }
       if (out.passed) {
-        // await getWorkouts();
         toast({
           title: "Workout removed!",
           description: "Now switch to workouts page and add sets & reps ",
@@ -141,6 +141,8 @@ export default function Tracker({ user }: Props) {
     if (out.passed) {
       // @ts-ignore
       setWorkouts(out.data);
+      // @ts-ignore
+      localStorage.setItem(getStoredWorkoutsKey(), JSON.stringify(out.data));
     } else {
       toast({
         title: "Failed to fetch workouts, try again later",
@@ -154,7 +156,9 @@ export default function Tracker({ user }: Props) {
   }, [date]);
 
   useEffect(() => {
-    getWorkouts();
+    const storedWorkouts = localStorage.getItem(getStoredWorkoutsKey());
+    if (storedWorkouts !== null) setWorkouts(JSON.parse(storedWorkouts));
+    else getWorkouts();
   }, [date, user, getWorkouts]);
 
   if (!user) return null;

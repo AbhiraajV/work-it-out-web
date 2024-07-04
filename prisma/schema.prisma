@@ -8,23 +8,24 @@ datasource db {
 }
 
 type Weight {
-  value  Float    
-  unit   WeightUnit
-  date   DateTime
+  value Float
+  unit  WeightUnit
+  date  DateTime
 }
 
 type Height {
-  value  Float  
-  unit   HeightUnit
-  date   DateTime
+  value Float
+  unit  HeightUnit
+  date  DateTime
 }
 
 type Set {
-  rep   Int  
+  rep    Int
   weight Weight
 }
+
 model User {
-  clerkId   String  @id @map("_id")
+  clerkId   String              @id @map("_id")
   username  String              @unique
   name      String?
   weight    Weight[]
@@ -34,21 +35,22 @@ model User {
   favorites embeddedexercises[]
 }
 
-
 model WorkoutHistory {
-  id        String            @id @default(auto()) @map("_id") @db.ObjectId
-  date      DateTime
-  user      User              @relation(fields: [userId], references: [clerkId])
-  userId    String
-  exercises WorkoutExercise[]
+  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
+  date                DateTime
+  user                User              @relation(fields: [userId], references: [clerkId])
+  userId              String
+  exercises           WorkoutExercise[]
   workoutHistoryTitle String?
-  favourited Boolean @default(false)
-  @@unique([userId,workoutHistoryTitle])
+  favourited          Boolean           @default(false)
+
+  @@unique([userId, workoutHistoryTitle])
+  @@index([userId, id])
 }
 
 model WorkoutExercise {
   id                  String            @id @default(auto()) @map("_id") @db.ObjectId
-  workoutHistory      WorkoutHistory    @relation(fields: [workoutHistoryId], references: [id],onDelete: Cascade)
+  workoutHistory      WorkoutHistory    @relation(fields: [workoutHistoryId], references: [id], onDelete: Cascade)
   workoutHistoryId    String
   embeddedexercises   embeddedexercises @relation(fields: [embeddedexercisesId], references: [id])
   embeddedexercisesId String
@@ -56,7 +58,7 @@ model WorkoutExercise {
 }
 
 model embeddedexercises {
-  id         String      @id @map("_id") @db.ObjectId
+  id         String    @id @map("_id") @db.ObjectId
   Title      String
   Desc       String
   Type       String
@@ -73,6 +75,26 @@ model embeddedexercises {
   userId           String?           @db.ObjectId
 }
 
+model Response {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  processId String
+  userId    String
+  queue     Queues
+  out       Json
+  status    ProcessSteps @default(Queued)
+  // @@index([processId, userId])
+
+  @@unique([processId, userId])
+}
+
+enum ProcessSteps {
+  Queued
+  Received
+  AI_Related_Data_Found
+  AI_Is_Understanding_Your_Case
+  Final_Touches
+  Done
+}
 
 enum Equipment {
   Foam_Roll
@@ -88,6 +110,11 @@ enum Equipment {
   Medicine_Ball
   Machine
   Other
+}
+
+enum Queues {
+  Review
+  WorkoutGenerator
 }
 
 enum BodyPart {
@@ -110,13 +137,10 @@ enum BodyPart {
   Forearms
 }
 
-
 enum WeightUnit {
   KG
   LB
 }
-
-
 
 enum HeightUnit {
   CM

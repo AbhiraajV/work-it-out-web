@@ -27,7 +27,11 @@ export default async function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className={`${poppins.variable}`}>
-        <body className={"min-h-screen bg-background font-sans antialiased"}>
+        <body
+          className={
+            "min-h-screen bg-background font-sans antialiased overflow-y-scroll"
+          }
+        >
           <Navbar />
           <main>{children}</main>
         </body>

@@ -1,7 +1,6 @@
 "use client";
 import { User } from "@prisma/client";
-import React, { useEffect, useRef, useState } from "react";
-import { useToast } from "../ui/use-toast";
+import React, { useState } from "react";
 import AutoupdatingName from "../util/AutoupdatingName";
 import DetailPicker from "../util/DetailPicker";
 type Props = {
@@ -10,10 +9,6 @@ type Props = {
 
 export default function Profile({ user }: Props) {
   const [currentUser, setCurrentUser] = useState(user);
-  useEffect(() => {
-    setCurrentUser(user);
-  }, [user]);
-  const { toast } = useToast();
 
   return (
     <div className="flex flex-col gap-2 mt-10">

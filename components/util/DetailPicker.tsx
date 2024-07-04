@@ -104,7 +104,7 @@ function DetailPicker({ currentUser, setCurrentUser }: Props) {
       toast({
         title: "Details updated",
       });
-      setCurrentUser(updatedUserDB.user);
+      // setCurrentUser(updatedUserDB.user);
     }
   };
 

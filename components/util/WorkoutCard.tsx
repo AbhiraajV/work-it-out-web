@@ -66,7 +66,7 @@ function WorkoutCard({
   return (
     <Card
       className={
-        "md:w-[30%] relative claymorphic h-fit ml-[-2rem] font-semibold flex flex-col justify-start items-start overflow-x-hidden pr-2 md:pr-0" +
+        "md:w-[30%] relative claymorphic h-fit ml-[-3rem] mt-[-1rem] font-semibold flex flex-col justify-start items-start overflow-x-hidden pr-2 md:pr-0" +
         !grid
           ? "overflow-y-scroll relative cursor-default custom-scrollbar  md:max-h-[250px]"
           : "relative"
@@ -90,14 +90,14 @@ function WorkoutCard({
       <Collapsible {...(!workoutExerciseId && { open: true })}>
         <CardHeader>
           <CardTitle className="">
-            <CollapsibleTrigger className="text-xl w-[80%] text-left md:text-lg underline font-bold truncate">
+            <CollapsibleTrigger className="text-lg w-[80%] text-left md:text-lg  text-gray-700 font-bold truncate">
               {workout.Title}
             </CollapsibleTrigger>
           </CardTitle>
         </CardHeader>
         <CollapsibleContent>
           <CardContent className="w-[100%] overflow-x-hidden flex item-center flex-col justify-center mt-[-1rem]">
-            <span className="text-sm underline font-bold text-gray-700">
+            <span className="text-sm font-bold text-gray-700">
               Description:
             </span>
             <ExtendibleDesc desc={workout.Desc} />
@@ -122,9 +122,7 @@ function WorkoutCard({
           )}
 
           <CardContent className="flex overflow-x-hidden item-center flex-col justify-center">
-            <span className="text-sm underline font-bold text-gray-700">
-              Tags:
-            </span>
+            <span className="text-sm font-bold text-gray-700">Tags:</span>
             <div className="w-[100%]">
               {workout.BodyPart && (
                 <Badge className="m-1" variant="default">

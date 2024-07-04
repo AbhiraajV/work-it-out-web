@@ -68,7 +68,7 @@ function AutoUpdatingWorkoutName({ workouts }: Props) {
           return acc;
         }, [])
         .forEach((bodyPart) => (title += bodyPart + " "));
-      title += formatDateShort(workouts.date);
+      title += formatDateShort(new Date(workouts.date));
       return workouts.workoutHistoryTitle || title;
     }
     return "workouts not found";

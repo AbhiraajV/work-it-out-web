@@ -31,7 +31,7 @@ function AutoupdatingName({ currentUser, setCurrentUser }: Props) {
         currentUser ? currentUser.clerkId : ""
       );
       if (ret.userCreated) {
-        setCurrentUser(ret.userCreated ? ret.user : currentUser);
+        // setCurrentUser(ret.userCreated ? ret.user : currentUser);
         toast({
           title: "Username updated successfully",
         });
@@ -69,12 +69,12 @@ function AutoupdatingName({ currentUser, setCurrentUser }: Props) {
     };
   }, [timeoutId]);
   return (
-    <span className="flex flex-row gap-1 items-center text-xl font-semibold">
-      Hi,
+    <span className="flex flex-row gap-1 items-center text-3xl  font-semibold">
+      👋🏻
       <div
         ref={divRef}
         id="profile_name"
-        className="text-xl font-bold border-b-purple-600 border-b-4 border-dashed"
+        className="text-3xl font-bold border-b-purple-600 border-b-4 border-dashed"
         contentEditable
         style={{ outline: "none" }}
         onBlur={() => handleProfileNameChange()}
@@ -82,7 +82,7 @@ function AutoupdatingName({ currentUser, setCurrentUser }: Props) {
       >
         {currentUser?.username}
       </div>
-      {/* <span className="text-4xl inline font-semibold">👋🏻 </span> */}
+      {/* <span className="text-md inline font-semibold">your details: </span> */}
     </span>
   );
 }

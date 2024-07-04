@@ -76,6 +76,11 @@ export const BodyParts: BodyPart[] = [
   "Quadriceps",
   "Forearms",
 ];
+export const uuidLike = () => {
+  const timestamp = Date.now().toString(36);
+  const randomPart = Math.random().toString(36).substr(2, 9);
+  return `${timestamp}-${randomPart}`;
+};
 export const navs = [
   {
     title: "Profile",

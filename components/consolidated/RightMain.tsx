@@ -3,6 +3,7 @@ import Profile from "./Profile";
 import { navs } from "@/lib/template.util";
 import Tracker from "./Tracker";
 import { Toaster } from "../ui/toaster";
+import Favourite from "./Favourite";
 
 async function RightMain({
   searchParams,
@@ -23,11 +24,17 @@ async function RightMain({
     >
       <Toaster />
 
-      <span className="font-extrabold text-3xl md:text-5xl">
+      <span className="font-extrabold text-3xl md:text-5xl hidden md:inline-block">
         {curNav?.title + " " + curNav?.titlePt2}
       </span>
       {nav === "profile" && <Profile user={user} />}
-      {nav === "tracker" && <Tracker user={user} />}
+      {nav === "tracker" && user && <Tracker user={user} />}
+      {nav === "favourite" && user && (
+        <Favourite
+          user={user}
+          workoutHistoryId={(searchParams?.whifw as string) || ""}
+        />
+      )}
     </div>
   );
 }
