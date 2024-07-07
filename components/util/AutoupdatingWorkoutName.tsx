@@ -198,7 +198,7 @@ function AutoUpdatingWorkoutName({ workouts }: Props) {
 
   const [expandText, setExpandText] = useState(false);
   return (
-    <div className="flex flex-col bg-violet-200 md:flex-row justify-between items-start text-xl mr-[1vw] md:ml-0 font-semibold  text-black py-2 px-3 rounded-sm mb-10">
+    <div className="flex flex-col md:flex-row justify-between items-start text-xl mr-[1vw] md:ml-0 font-semibold  text-black py-2 px-3 rounded-sm mb-10">
       {workouts && (
         <>
           <div className="flex flex-col justify-between items-baseline">
