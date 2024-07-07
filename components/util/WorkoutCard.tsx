@@ -107,10 +107,7 @@ function WorkoutCard({
             <span className="text-sm font-bold text-gray-700">
               Description:
             </span>
-            <ExtendibleDesc
-              desc={workout.Desc}
-              showIn={workoutExerciseId === undefined}
-            />
+            <ExtendibleDesc desc={workout.Desc} showIn={false} />
           </CardContent>
           {workoutExerciseId && (
             <CardContent className="w-[100%] overflow-x-hidden flex item-center flex-col justify-center mt-[-1rem]">
