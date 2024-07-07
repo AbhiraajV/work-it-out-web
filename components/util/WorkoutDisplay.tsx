@@ -86,7 +86,7 @@ function WorkoutDisplay({ workouts, removeWorkout, userId }: Props) {
       <div
         className={
           fullscreen
-            ? "w-full h-fit p-2 flex flex-col gap-2 relative custom-scrollbar overflow-y-scroll max-h-[100%] mb-[50px] mt-[50px]"
+            ? "w-full h-fit p-2 flex flex-col gap-2 relative custom-scrollbar overflow-y-scroll max-h-[100%] mb-[150px] mt-[0px]"
             : "w-full h-fit p-2 flex flex-col gap-2 relative custom-scrollbar overflow-y-scroll max-h-[70%] mb-[400px] mt-[-1rem]"
         }
       >
