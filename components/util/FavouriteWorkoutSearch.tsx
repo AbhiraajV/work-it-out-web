@@ -90,13 +90,16 @@ function FavouriteWorkoutSearch({ favouriteWorkoutsForSearch }: Props) {
             variant={"default"}
             onClick={async () => {
               const newDate = new Date(
-                localStorage.getItem("selected-date") + ""
+                window.localStorage.getItem("selected-date") + ""
               );
               const out = await copyWorkoutHistory({
                 newDate,
                 workoutHistoryId: selectedFavouriteWorkoutId,
               });
-              if (out.passed) location.reload();
+              if (out.passed) {
+                window.localStorage.removeItem(newDate + "-workout-stored")
+                location.reload();
+              }
               else toast({ title: "something went wrong,try again later" });
             }}
           >
@@ -107,14 +110,17 @@ function FavouriteWorkoutSearch({ favouriteWorkoutsForSearch }: Props) {
             variant={"default"}
             onClick={async () => {
               const newDate = new Date(
-                localStorage.getItem("selected-date") + ""
+                window.localStorage.getItem("selected-date") + ""
               );
               const out = await copyWorkoutHistory({
                 newDate,
                 workoutHistoryId: selectedFavouriteWorkoutId,
                 noSets: true,
               });
-              if (out.passed) location.reload();
+              if (out.passed) {
+                window.localStorage.removeItem(newDate + "-workout-stored")
+                location.reload();
+              }
               else toast({ title: "something went wrong,try again later" });
             }}
           >

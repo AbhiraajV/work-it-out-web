@@ -33,7 +33,7 @@ export function ExcerciseCarousel({
 }) {
   const [toggleGrid, setToggleGrid] = React.useState(false);
   return (
-    <div className="flex flex-col gap-1 relative h-full">
+    <div className="flex flex-col gap-1 relative h-full ">
       <AdvancedWorkoutSearch searchFunction={searchFunction}>
         <div className="absolute right-[-8%] top-[50%] translate-y-[-50%]">
           <ToggleGridCarousel

@@ -4,7 +4,7 @@
 // } from "./llm.lib";
 // import { EmbeddedExcerciseQuery } from "./prisma.lib";
 
-import { BodyPart } from "@prisma/client";
+import { BodyPart, Set, WeightUnit } from "@prisma/client";
 export function formatDateShort(date: Date): string {
   const day = date.getDate();
   const month = date.getMonth() + 1; // Months are 0-based
@@ -152,13 +152,144 @@ export function formatDate(date: Date) {
 
   return formattedDate;
 }
-// export const consolidatedGetSuitableWorkout = async (query: string) => {
-//   const workouts = await EmbeddedExcerciseQuery(query, 20, 200);
-//   console.log({ workouts });
-//   console.log("Reasoning...");
-//   const response = await getResponseBasedOnQueryAndWorkouts(query, workouts);
-//   return response;
-// };
+
+export type SetStats = {
+  oneRepMax: string;
+  comfortableWeights: {
+    reps12: string;
+    reps15: string;
+    reps20: string;
+  };
+  totalVolume: string;
+  maxWeight: string;
+  averageWeight: string;
+  maxReps: number;
+};
+
+function convertToKg(value: number, unit: WeightUnit): number {
+  if (unit === "LB") {
+    return value * 0.453592;
+  }
+  return value;
+}
+
+function formatWeight(value: number): string {
+  return value.toFixed(2) + " kg.";
+}
+
+function calculateOneRepMax(sets: Set[]): number {
+  if (sets.length === 0) return 0;
+  const epleyFormula = (weight: number, reps: number) =>
+    weight * (1 + reps / 30);
+  return Math.max(
+    ...sets.map((set) =>
+      epleyFormula(convertToKg(set.weight.value, set.weight.unit), set.rep)
+    )
+  );
+}
+
+function calculateComfortableWeight(
+  oneRepMax: number,
+  targetReps: number
+): number {
+  return oneRepMax / (1 + targetReps / 30);
+}
+
+function calculateTotalVolume(sets: Set[]): number {
+  return sets.reduce(
+    (total, set) =>
+      total + set.rep * convertToKg(set.weight.value, set.weight.unit),
+    0
+  );
+}
+
+function calculateMaxWeight(sets: Set[]): number {
+  return Math.max(
+    ...sets.map((set) => convertToKg(set.weight.value, set.weight.unit))
+  );
+}
+
+function calculateAverageWeight(sets: Set[]): number {
+  if (sets.length === 0) return 0;
+  const totalWeight = sets.reduce(
+    (sum, set) => sum + convertToKg(set.weight.value, set.weight.unit),
+    0
+  );
+  return totalWeight / sets.length;
+}
+
+function calculateMaxReps(sets: Set[]): number {
+  return Math.max(...sets.map((set) => set.rep));
+}
+
+export function calculateStats(sets: Set[]): SetStats {
+  const oneRepMax = calculateOneRepMax(sets);
+
+  return {
+    oneRepMax: formatWeight(oneRepMax),
+    comfortableWeights: {
+      reps12: formatWeight(calculateComfortableWeight(oneRepMax, 12)),
+      reps15: formatWeight(calculateComfortableWeight(oneRepMax, 15)),
+      reps20: formatWeight(calculateComfortableWeight(oneRepMax, 20)),
+    },
+    totalVolume: formatWeight(calculateTotalVolume(sets)),
+    maxWeight: formatWeight(calculateMaxWeight(sets)),
+    averageWeight: formatWeight(calculateAverageWeight(sets)),
+    maxReps: calculateMaxReps(sets),
+  };
+}
+
+export function calculateScore(stats: SetStats): number {
+  const {
+    oneRepMax,
+    comfortableWeights,
+    totalVolume,
+    maxWeight,
+    averageWeight,
+    maxReps,
+  }: SetStats = stats;
+
+  // Normalizing and weighting parameters
+  const oneRepMaxScore = parseInt(oneRepMax.replace(" kg.", "")) * 0.25;
+  const comfortableWeightsScore =
+    ((parseInt(comfortableWeights.reps12.replace(" kg.", "")) +
+      parseInt(comfortableWeights.reps15.replace(" kg.", "")) +
+      parseInt(comfortableWeights.reps20.replace(" kg.", ""))) /
+      3) *
+    0.2;
+  const totalVolumeScore = parseInt(totalVolume.replace(" kg.", "")) * 0.15;
+  const maxWeightScore = parseInt(maxWeight.replace(" kg.", "")) * 0.2;
+  const averageWeightScore = parseInt(averageWeight.replace(" kg.", "")) * 0.1;
+  const maxRepsScore = maxReps * 0.1;
+
+  // Combining the scores
+  const score =
+    oneRepMaxScore +
+    comfortableWeightsScore +
+    totalVolumeScore +
+    maxWeightScore +
+    averageWeightScore +
+    maxRepsScore;
+
+  return parseFloat(score.toFixed(2)); // Truncate to 2 decimal places
+}
+
+export const metrics = [
+  { key: "averageWeight", label: "Average Weight" },
+  { key: "comfortableWeights.reps12", label: "12 Rep Comfort Est." },
+  { key: "comfortableWeights.reps15", label: "15 Rep Comfort Est." },
+  { key: "comfortableWeights.reps20", label: "20 Rep Comfort Est." },
+  { key: "maxReps", label: "Max Reps" },
+  { key: "maxWeight", label: "Max Weight" },
+  { key: "oneRepMax", label: "One Rep Max Est." },
+  { key: "totalVolume", label: "Total Volume" },
+  { key: "score", label: "Score", isCalculated: true },
+];
+
+export const renderValue = (obj: any, key: any) => {
+  const keys = key.split(".");
+  return keys.reduce((acc: any, cur: any) => acc[cur], obj);
+};
 export const queryGeneratorSystemMessages = [
   {
     role: "system",

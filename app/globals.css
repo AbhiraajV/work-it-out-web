@@ -74,6 +74,68 @@
 @apply bg-background text-foreground;
 }
 }
+@keyframes backgroundTransition {
+  0% {
+    background-color: #FF9A9E;
+  }
+
+  /* Light pink */
+  10% {
+    background-color: #FECFEF;
+  }
+
+  /* Light coral */
+  20% {
+    background-color: #FF9A8B;
+  }
+
+  /* Light red-orange */
+  30% {
+    background-color: #FFC3A0;
+  }
+
+  /* Light peach */
+  40% {
+    background-color: #FFDF9E;
+  }
+
+  /* Light gold */
+  50% {
+    background-color: #D4FC79;
+  }
+
+  /* Light lime green */
+  60% {
+    background-color: #A4E2FF;
+  }
+
+  /* Light sky blue */
+  70% {
+    background-color: #C1FFD7;
+  }
+
+  /* Light mint green */
+  80% {
+    background-color: #B5A1FF;
+  }
+
+  /* Light lavender */
+  90% {
+    background-color: #FCFF9E;
+  }
+
+  /* Light yellow */
+  100% {
+    background-color: #FF9A9E;
+  }
+
+  /* Light pink */
+}
+
+.transition-bg {
+  animation: backgroundTransition 20s infinite;
+  -webkit-animation: backgroundTransition 20s infinite;
+}
 
 .claymorphic {
   box-shadow:

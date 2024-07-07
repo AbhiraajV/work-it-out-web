@@ -506,6 +506,7 @@ interface CopyWorkoutHistoryParams {
 }
 export const deleteWorkoutHistory = async (workoutHistoryId: string) => {
   try {
+    // console.log({ workoutHistoryId:  });
     const out = await prisma.workoutHistory.delete({
       where: { id: workoutHistoryId },
     });
@@ -581,3 +582,58 @@ export const copyWorkoutHistory = async ({
 //     },
 //   })
 // }
+
+export const getSets = async (userId: string, embeddedexercisesId: string) => {
+  console.log("called " + userId + " for " + embeddedexercisesId);
+  const prevWorkoutsIncludingRequiredExercise =
+    await prisma.workoutHistory.findMany({
+      where: {
+        userId: userId,
+        OR: [
+          {
+            exercises: {
+              some: {
+                embeddedexercisesId: embeddedexercisesId,
+              },
+            },
+          },
+          {
+            exercises: {
+              every: {
+                embeddedexercisesId: embeddedexercisesId,
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        date: true,
+        exercises: {
+          select: {
+            embeddedexercisesId: true,
+            embeddedexercises: {
+              select: {
+                Title: true,
+              },
+            },
+            sets: true,
+          },
+        },
+      },
+    });
+  return prevWorkoutsIncludingRequiredExercise
+    .flatMap((ex) => ({
+      date: ex.date,
+      exercise: ex.exercises
+        .filter((exi) => exi.embeddedexercisesId === embeddedexercisesId)
+        .flatMap((exm) => ({
+          sets: exm.sets,
+          title: exm.embeddedexercises.Title,
+        })),
+    }))
+    .filter((entry) => entry.exercise.some((ex) => ex.sets.length > 0))
+    .map((entry) => ({
+      date: entry.date,
+      sets: entry.exercise.flatMap((ex) => ex.sets),
+    }));
+};

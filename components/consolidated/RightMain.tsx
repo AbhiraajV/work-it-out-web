@@ -16,7 +16,7 @@ async function RightMain({
 
   return (
     <div
-      className="w-[100%] h-[100vh] p-3 transition-all text-black md:pt-6 md:p-6 relative"
+      className="w-[100%] h-[100vh] p-3 transition-all md:pt-6 md:p-6 relative"
       style={{
         // backgroundColor: bg,
         transition: "background-color 6s ease",

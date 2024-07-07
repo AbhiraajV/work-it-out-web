@@ -22,11 +22,11 @@ type Props = {
 };
 export default function Tracker({ user }: Props) {
   const initialDate = new Date(
-    localStorage.getItem("selected-date") || new Date().toDateString()
+    window.localStorage.getItem("selected-date") || new Date().toDateString()
   );
   const [date, setDate] = useState<Date | undefined>(initialDate);
 
-  const getStoredWorkoutsKey = () => date + "-workout-stored";
+  const getStoredWorkoutsKey = () => date?.toDateString() + "-workout-stored";
   const [workouts, setWorkouts] = useState<WorkoutHistoryWithExercises | null>(
     null
   );
@@ -65,7 +65,7 @@ export default function Tracker({ user }: Props) {
           ),
         } as WorkoutHistoryWithExercises)
     );
-    localStorage.removeItem(getStoredWorkoutsKey());
+    window.localStorage.removeItem(getStoredWorkoutsKey());
     try {
       const out = await deleteWorkout({
         exerciseId: workoutExeciseId,
@@ -132,7 +132,7 @@ export default function Tracker({ user }: Props) {
   const { toast } = useToast();
   const getWorkouts = useCallback(async () => {
     if (!user || !date) return;
-
+    console.log("Called getWorkouts " + date);
     const out = await findWorkoutsOnThisDay({
       date,
       userId: user.clerkId,
@@ -141,29 +141,33 @@ export default function Tracker({ user }: Props) {
     if (out.passed) {
       // @ts-ignore
       setWorkouts(out.data);
-      // @ts-ignore
-      localStorage.setItem(getStoredWorkoutsKey(), JSON.stringify(out.data));
+      window.localStorage.setItem(
+        getStoredWorkoutsKey(),
+        // @ts-ignore
+        JSON.stringify(out.data)
+      );
     } else {
       toast({
         title: "Failed to fetch workouts, try again later",
       });
     }
-  }, [date, user, toast]);
+  }, [date, user]);
 
   useEffect(() => {
+    setWorkouts(null);
     if (!date) return;
-    localStorage.setItem("selected-date", date.toDateString());
+    window.localStorage.setItem("selected-date", date.toDateString());
   }, [date]);
 
   useEffect(() => {
-    const storedWorkouts = localStorage.getItem(getStoredWorkoutsKey());
+    const storedWorkouts = window.localStorage.getItem(getStoredWorkoutsKey());
     if (storedWorkouts !== null) setWorkouts(JSON.parse(storedWorkouts));
     else getWorkouts();
-  }, [date, user, getWorkouts]);
+  }, [date, user]);
 
   if (!user) return null;
   return (
-    <div className="flex flex-col gap-4 mt-5 w-screen md:w-[100%] h-[100vh] ml-[-2.5vw]">
+    <div className="flex flex-col gap-4 w-screen md:w-[100%] h-[100vh] ml-[-2.5vw]">
       <div className="flex gap-1 items-center">
         <DatePickerDemo date={date} setDate={setDate} />
 
@@ -171,18 +175,25 @@ export default function Tracker({ user }: Props) {
           <div
             className="text-xs w-fit whitespace-nowrap h-[100%] py-2 md:text-md font-semibold border-red-600 border-[1px] px-2 text-red-600 rounded-md cursor-pointer"
             onClick={async () => {
+              const tempStoreWorkouts = workouts;
+              setWorkouts(null);
               const out = await deleteWorkoutHistory(workouts?.id);
-              if (out.passed) location.reload();
-              else
+              if (out.passed) {
+                window.localStorage.removeItem(getStoredWorkoutsKey());
+                setWorkouts(null);
+              } else {
+                setWorkouts({ ...tempStoreWorkouts });
                 toast({
                   title: "could not delete the workout,try again later",
                 });
+              }
             }}
           >
-            Delete ❌
+            Clear all Workouts ❌
           </div>
         )}
       </div>
+
       <TabsHandler
         tabs={[
           {
@@ -209,10 +220,11 @@ export default function Tracker({ user }: Props) {
                 workouts={searchWorkouts}
               />
             ),
-            key: "workoutSearch",
+            key: "workoutAdd",
             name: "Add Workout",
           },
         ]}
+        workouts={workouts}
       />
     </div>
   );

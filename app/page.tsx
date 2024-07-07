@@ -21,12 +21,17 @@ export default async function Home({
     );
   }
   return (
-    <div className="md:w-[90%] w-[100%] lg:w-[70%] lg:ml-[15%] md:ml-[5%] mt-0 md:mt-10 max-h-[100%] md:h-[80vh] overflow-y-hidden">
+    <div className=" md:w-[90%] w-[100%] lg:w-[70%] lg:ml-[15%] md:ml-[5%] mt-0 md:mt-10 max-h-[100%] md:h-[80vh] overflow-y-hidden">
       {/* <div className="claymorphic rounded-lg overflow-hidden flex flex-col-reverse md:flex-row w-[100%] h-[100%] mt-[-10%] md:mt-0"> */}
-      <div className="md:w-1/4 w-[100%] md:h-[100%] bg-black flex flex-row md:flex-col items-stretch md:items-start pt-4 md:pt-10 p-6 justify-between md:justify-start md:gap-4 font-black md:text-sm text-lg fixed bottom-0 md:static z-10 left-0">
+      <div
+        className="md:w-1/4 w-[100%] bg-[#28282B] md:h-[100%] flex flex-row-reverse
+       md:flex-col items-stretch md:items-start py-3
+       md:pt-10 px-6 justify-between md:justify-start md:gap-4 
+       font-black md:text-sm text-lg fixed bottom-0 md:static z-10 left-0"
+      >
         {navs.map((nav) => (
           <span key={nav.nav} className="text-white cursor-pointer">
-            <Link href={`/?nav=${nav.nav}`}>
+            <Link href={`/?nav=${nav.nav}`} className=" text-2xl">
               {nav.titleEmoji}
               <span className="hidden md:inline">{nav.title} </span>
               <span className="hidden xl:inline">{nav.titlePt2}</span>
@@ -38,6 +43,5 @@ export default async function Home({
         <RightMain searchParams={searchParams} />
       </div>
     </div>
-    // </div>
   );
 }

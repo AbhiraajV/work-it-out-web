@@ -22,7 +22,7 @@ type Props = {
   workout: Partial<embeddedexercises>;
   addNewWorkout?: (workoutId: string) => Promise<void>;
   removeWorkout?: (workoutId: string) => Promise<void>;
-
+  userId?: string;
   noyt?: boolean;
   grid?: boolean;
   sets?:
@@ -38,8 +38,14 @@ type Props = {
   workoutExerciseId?: string;
 };
 
-const ExtendibleDesc = ({ desc }: { desc: string | undefined }) => {
-  const [show, setShow] = useState(false);
+const ExtendibleDesc = ({
+  desc,
+  showIn,
+}: {
+  desc: string | undefined;
+  showIn: boolean;
+}) => {
+  const [show, setShow] = useState(showIn);
   return (
     <CardDescription
       className="p-1 bg-slate-50 rounded-md"
@@ -57,6 +63,7 @@ function WorkoutCard({
   grid = false,
   sets = undefined,
   workoutExerciseId = undefined,
+  userId = undefined,
 }: Props) {
   const [setsState, setSetsState] = useState<Set[]>([]);
   useEffect(() => {
@@ -91,7 +98,7 @@ function WorkoutCard({
         <CardHeader>
           <CardTitle className="">
             <CollapsibleTrigger className="text-lg w-[80%] text-left md:text-lg  text-gray-700 font-bold truncate">
-              {workout.Title}
+              {workout.Title} {workoutExerciseId && "↕️"}
             </CollapsibleTrigger>
           </CardTitle>
         </CardHeader>
@@ -100,7 +107,10 @@ function WorkoutCard({
             <span className="text-sm font-bold text-gray-700">
               Description:
             </span>
-            <ExtendibleDesc desc={workout.Desc} />
+            <ExtendibleDesc
+              desc={workout.Desc}
+              showIn={workoutExerciseId === undefined}
+            />
           </CardContent>
           {workoutExerciseId && (
             <CardContent className="w-[100%] overflow-x-hidden flex item-center flex-col justify-center mt-[-1rem]">
@@ -114,6 +124,8 @@ function WorkoutCard({
                       setSetsState={setSetsState}
                       sets={setsState}
                       workoutExerciseId={workoutExerciseId}
+                      embeddedExerciseId={workout.id}
+                      userId={userId}
                     />
                   )}
                 </CollapsibleContent>

@@ -46,7 +46,7 @@ function AdvancedWorkoutSearch({ children, searchFunction }: Props) {
     label: "Any",
   });
   const initiallySelectedBodyPart =
-    (localStorage.getItem("selected-bp") as BodyPart) || undefined;
+    (window.localStorage.getItem("selected-bp") as BodyPart) || undefined;
   const [selectedBodyPart, setSelectedBodyPart] = useState<
     BodyPart | undefined
   >(initiallySelectedBodyPart);
@@ -54,11 +54,11 @@ function AdvancedWorkoutSearch({ children, searchFunction }: Props) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   useEffect(() => {
-    localStorage.setItem("selected-bp", selectedBodyPart + "");
+    window.localStorage.setItem("selected-bp", selectedBodyPart + "");
   }, [selectedBodyPart]);
 
   return (
-    <div className="flex gap-1 items-center relative md:w-[100%] w-[95%] ml-[-2%] ">
+    <div className="flex gap-1 items-center relative md:w-[100%] w-[88vw] ml-[2.5vw]">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -112,9 +112,24 @@ function AdvancedWorkoutSearch({ children, searchFunction }: Props) {
         className="w-[140%] "
         onChange={(e) => setQuery(e.target.value)}
         value={query}
+        onKeyDown={async (e) => {
+          if (
+            e.keyCode === 13 ||
+            e.keyCode === 9 ||
+            e.key === "Enter" ||
+            e.key === "Tab"
+          ) {
+            if (!selectedBodyPart) {
+              toast({
+                title: "Remember, choosing a muscle will help the AI 🤸🏻‍♂️",
+              });
+            }
+            await searchFunction({ query, bodyPart: selectedBodyPart });
+          }
+        }}
       />
       <button
-        className="outline-none border-l-2 absolute right-2 top-[50%] translate-y-[-50%] text-2xl bg-white"
+        className="outline-none border-l-2 absolute right-2 top-[50%] translate-y-[-50%] text-2xl hidden md:inline-block bg-white"
         type="submit"
         onClick={async () => {
           if (!selectedBodyPart) {

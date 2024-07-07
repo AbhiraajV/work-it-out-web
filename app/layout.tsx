@@ -29,7 +29,7 @@ export default async function RootLayout({
       <html lang="en" className={`${poppins.variable}`}>
         <body
           className={
-            "min-h-screen bg-background font-sans antialiased overflow-y-scroll"
+            "min-h-screen bg-background font-sans antialiased overflow-y-hidden"
           }
         >
           <Navbar />
